@@ -1,0 +1,73 @@
+                         ┌──────────────────────────┐
+                         │        WEB BROWSER       │
+                         │                          │
+                         │ Next.js / React          │
+                         │                          │
+                         │ • File Manager           │
+                         │ • Video Player           │
+                         │ • Playlists              │
+                         │ • Uploads                │
+                         │ • Downloads              │
+                         │ • Cloud Accounts         │
+                         └────────────┬─────────────┘
+                                      │
+                                   HTTPS
+                                      │
+                                      ▼
+                         ┌──────────────────────────┐
+                         │     CDN / WAF / TLS      │
+                         └────────────┬─────────────┘
+                                      │
+                                      ▼
+                         ┌──────────────────────────┐
+                         │       API SERVER         │
+                         │                          │
+                         │ Authentication           │
+                         │ Users                    │
+                         │ Files                    │
+                         │ Folders                  │
+                         │ Playlists                │
+                         │ Storage                  │
+                         │ Transfers                │
+                         │ Media                    │
+                         └────────────┬─────────────┘
+                                      │
+                 ┌────────────────────┼────────────────────┐
+                 │                    │                    │
+                 ▼                    ▼                    ▼
+        ┌────────────────┐   ┌────────────────┐   ┌────────────────┐
+        │ PostgreSQL     │   │ Redis          │   │ Job Queue      │
+        │                │   │                │   │                │
+        │ Users          │   │ Cache          │   │ Upload jobs    │
+        │ Files          │   │ Sessions       │   │ Download jobs  │
+        │ Folders        │   │ Locks          │   │ Scan jobs      │
+        │ Accounts       │   │ Rate limits    │   │ Media jobs     │
+        │ Playlists      │   │                │   │                │
+        └────────────────┘   └────────────────┘   └───────┬────────┘
+                                                           │
+                                                           ▼
+                                                ┌─────────────────────┐
+                                                │   WORKER SYSTEM     │
+                                                │                     │
+                                                │ Transfer Worker     │
+                                                │ Download Worker     │
+                                                │ Upload Worker       │
+                                                │ Media Worker        │
+                                                └──────────┬──────────┘
+                                                           │
+                                                           ▼
+                                          ┌────────────────────────────────┐
+                                          │    STORAGE ABSTRACTION LAYER   │
+                                          │                                │
+                                          │      StorageProvider           │
+                                          │             │                  │
+                                          │    ┌────────┼────────┐         │
+                                          │    │        │        │         │
+                                          │    ▼        ▼        ▼         │
+                                          │ Google    Dropbox  OneDrive    │
+                                          │ Adapter   Adapter  Adapter     │
+                                          └────┬────────┬────────┬─────────┘
+                                               │        │        │
+                                               ▼        ▼        ▼
+                                           Google    Dropbox  Microsoft
+                                           Drive      Cloud    OneDrive
