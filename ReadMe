@@ -3,75 +3,64 @@ Megh : A unified web-based cloud storage platform that combines multiple cloud a
 
 
                          ┌──────────────────────────┐
-                         │        WEB BROWSER       │
+                         │      CLIENT / UI         │
                          │                          │
-                         │ Next.js / React          │
-                         │                          │
-                         │ • File Manager           │
-                         │ • Video Player           │
-                         │ • Playlists              │
-                         │ • Uploads                │
-                         │ • Downloads              │
-                         │ • Cloud Accounts         │
+                         │      Web / Mobile        │
+                         │      Application         │
                          └────────────┬─────────────┘
                                       │
-                                   HTTPS
+                                  HTTPS / API
                                       │
                                       ▼
                          ┌──────────────────────────┐
-                         │     CDN / WAF / TLS      │
+                         │   EDGE / SECURITY LAYER  │
+                         │                          │
+                         │   CDN / WAF / TLS        │
                          └────────────┬─────────────┘
                                       │
                                       ▼
                          ┌──────────────────────────┐
-                         │       API SERVER         │
+                         │     APPLICATION LAYER    │
                          │                          │
-                         │ Authentication           │
-                         │ Users                    │
-                         │ Files                    │
-                         │ Folders                  │
-                         │ Playlists                │
-                         │ Storage                  │
-                         │ Transfers                │
-                         │ Media                    │
+                         │     API / Services       │
+                         │                          │
+                         │     Business Logic       │
+                         │     Authentication       │
+                         │     Authorization        │
                          └────────────┬─────────────┘
                                       │
                  ┌────────────────────┼────────────────────┐
                  │                    │                    │
                  ▼                    ▼                    ▼
         ┌────────────────┐   ┌────────────────┐   ┌────────────────┐
-        │ PostgreSQL     │   │ Redis          │   │ Job Queue      │
+        │   DATABASE     │   │     CACHE      │   │  JOB / QUEUE   │
         │                │   │                │   │                │
-        │ Users          │   │ Cache          │   │ Upload jobs    │
-        │ Files          │   │ Sessions       │   │ Download jobs  │
-        │ Folders        │   │ Locks          │   │ Scan jobs      │
-        │ Accounts       │   │ Rate limits    │   │ Media jobs     │
-        │ Playlists      │   │                │   │                │
+        │ Persistent     │   │ Fast /         │   │ Asynchronous   │
+        │ Data           │   │ Temporary Data │   │ Processing     │
         └────────────────┘   └────────────────┘   └───────┬────────┘
                                                            │
                                                            ▼
                                                 ┌─────────────────────┐
-                                                │   WORKER SYSTEM     │
+                                                │   WORKER / COMPUTE  │
                                                 │                     │
-                                                │ Transfer Worker     │
-                                                │ Download Worker     │
-                                                │ Upload Worker       │
-                                                │ Media Worker        │
+                                                │ Background Tasks    │
+                                                │ Processing          │
+                                                │ Scheduled Jobs      │
                                                 └──────────┬──────────┘
                                                            │
                                                            ▼
                                           ┌────────────────────────────────┐
-                                          │    STORAGE ABSTRACTION LAYER   │
+                                          │      ABSTRACTION LAYER         │
                                           │                                │
-                                          │      StorageProvider           │
-                                          │             │                  │
-                                          │    ┌────────┼────────┐         │
-                                          │    │        │        │         │
-                                          │    ▼        ▼        ▼         │
-                                          │ Google    Dropbox  OneDrive    │
-                                          │ Adapter   Adapter  Adapter     │
-                                          └────┬────────┬────────┬─────────┘
-                                               │        │        │
-                                               ▼        ▼        ▼
-                                           Google    Dropbox  Microsoft
-                                           Drive      Cloud    OneDrive
+                                          │      Provider Interface        │
+                                          │              │                 │
+                                          │       ┌──────┼──────┐          │
+                                          │       │      │      │          │
+                                          │       ▼      ▼      ▼          │
+                                          │    Provider Provider Provider  │
+                                          │       A      B      C          │
+                                          └───────┬──────┬──────┬──────────┘
+                                                  │      │      │
+                                                  ▼      ▼      ▼
+                                             External / Infrastructure
+                                                   Services
