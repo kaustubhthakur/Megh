@@ -83,8 +83,7 @@ exports.register = async (req, res) => {
         is_vendor: user.is_vendor,
         email_verified: user.email_verified,
         phone_verified: user.phone_verified,
-        onboarding_completed:
-          user.onboarding_completed,
+        onboarding_completed: user.onboarding_completed,
       },
     });
   } catch (error) {
@@ -95,7 +94,6 @@ exports.register = async (req, res) => {
     });
   }
 };
-
 
 exports.login = async (req, res) => {
   try {
@@ -142,6 +140,16 @@ exports.login = async (req, res) => {
     return res.status(200).json({
       message: "Login successful",
       token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        is_vendor: user.is_vendor,
+        email_verified: user.email_verified,
+        phone_verified: user.phone_verified,
+        onboarding_completed: user.onboarding_completed,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -151,7 +159,6 @@ exports.login = async (req, res) => {
     });
   }
 };
-
 
 exports.sendOtp = async (req, res) => {
   try {
@@ -198,6 +205,12 @@ exports.sendOtp = async (req, res) => {
       });
     }
 
+    if (method === "phone" && !user.phone) {
+      return res.status(400).json({
+        message: "Phone number not found",
+      });
+    }
+
     const canResend = await User.canResendOtp(
       user.id,
       method
@@ -211,7 +224,8 @@ exports.sendOtp = async (req, res) => {
         );
 
       return res.status(429).json({
-        message: "Please wait before requesting another OTP",
+        message:
+          "Please wait before requesting another OTP",
         resend_in: resendTime,
       });
     }
@@ -248,11 +262,8 @@ exports.sendOtp = async (req, res) => {
   }
 };
 
-
 exports.logout = async (req, res) => {
   try {
-    res.clearCookie("token");
-
     return res.status(200).json({
       message: "Logout successful",
     });
