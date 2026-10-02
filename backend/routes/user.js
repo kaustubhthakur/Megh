@@ -11,6 +11,12 @@ router.get(
   userController.getUser
 );
 
+router.get(
+  "/all",
+  authMiddleware,
+  userController.getUsers
+);
+
 router.put(
   "/profile",
   authMiddleware,
