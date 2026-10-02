@@ -4,6 +4,7 @@ const USER_FIELDS = `
   id,
   username,
   email,
+  password,
   phone,
   avatar,
   is_vendor,
@@ -14,7 +15,6 @@ const USER_FIELDS = `
   updated_at
 `;
 
-// Create user
 exports.createUser = async ({
   username,
   email,
@@ -46,7 +46,8 @@ exports.createUser = async ({
       FALSE,
       FALSE
     )
-    RETURNING ${USER_FIELDS}
+    RETURNING
+      ${USER_FIELDS}
     `,
     [
       username,
@@ -60,8 +61,6 @@ exports.createUser = async ({
   return result.rows[0];
 };
 
-
-// Find user by email
 exports.findUserByEmail = async (email) => {
   const result = await pool.query(
     `
@@ -75,8 +74,6 @@ exports.findUserByEmail = async (email) => {
   return result.rows[0];
 };
 
-
-// Find user by phone
 exports.findUserByPhone = async (phone) => {
   const result = await pool.query(
     `
@@ -90,8 +87,6 @@ exports.findUserByPhone = async (phone) => {
   return result.rows[0];
 };
 
-
-// Find user by username
 exports.findUserByUsername = async (username) => {
   const result = await pool.query(
     `
@@ -105,8 +100,6 @@ exports.findUserByUsername = async (username) => {
   return result.rows[0];
 };
 
-
-// Find user by ID
 exports.findUserById = async (id) => {
   const result = await pool.query(
     `
@@ -120,8 +113,6 @@ exports.findUserById = async (id) => {
   return result.rows[0];
 };
 
-
-// Get user
 exports.getUser = async (id) => {
   const result = await pool.query(
     `
@@ -136,8 +127,6 @@ exports.getUser = async (id) => {
   return result.rows[0];
 };
 
-
-// Get all users
 exports.getAllUsers = async () => {
   const result = await pool.query(
     `
@@ -151,8 +140,6 @@ exports.getAllUsers = async () => {
   return result.rows;
 };
 
-
-// Update user
 exports.updateUser = async (
   id,
   {
@@ -170,7 +157,8 @@ exports.updateUser = async (
       phone = COALESCE($3, phone),
       updated_at = NOW()
     WHERE id = $4
-    RETURNING ${USER_FIELDS}
+    RETURNING
+      ${USER_FIELDS}
     `,
     [
       username,
@@ -183,8 +171,6 @@ exports.updateUser = async (
   return result.rows[0];
 };
 
-
-// Verify email
 exports.verifyEmail = async (userId) => {
   const result = await pool.query(
     `
@@ -193,7 +179,8 @@ exports.verifyEmail = async (userId) => {
       email_verified = TRUE,
       updated_at = NOW()
     WHERE id = $1
-    RETURNING ${USER_FIELDS}
+    RETURNING
+      ${USER_FIELDS}
     `,
     [userId]
   );
@@ -201,8 +188,6 @@ exports.verifyEmail = async (userId) => {
   return result.rows[0];
 };
 
-
-// Verify phone
 exports.verifyPhone = async (userId) => {
   const result = await pool.query(
     `
@@ -211,7 +196,8 @@ exports.verifyPhone = async (userId) => {
       phone_verified = TRUE,
       updated_at = NOW()
     WHERE id = $1
-    RETURNING ${USER_FIELDS}
+    RETURNING
+      ${USER_FIELDS}
     `,
     [userId]
   );
@@ -219,27 +205,6 @@ exports.verifyPhone = async (userId) => {
   return result.rows[0];
 };
 
-
-// Mark vendor onboarding as completed
-exports.completeOnboarding = async (userId) => {
-  const result = await pool.query(
-    `
-    UPDATE users
-    SET
-      onboarding_completed = TRUE,
-      updated_at = NOW()
-    WHERE id = $1
-      AND is_vendor = TRUE
-    RETURNING ${USER_FIELDS}
-    `,
-    [userId]
-  );
-
-  return result.rows[0];
-};
-
-
-// Make user a vendor
 exports.makeVendor = async (userId) => {
   const result = await pool.query(
     `
@@ -249,7 +214,8 @@ exports.makeVendor = async (userId) => {
       onboarding_completed = FALSE,
       updated_at = NOW()
     WHERE id = $1
-    RETURNING ${USER_FIELDS}
+    RETURNING
+      ${USER_FIELDS}
     `,
     [userId]
   );
@@ -257,8 +223,24 @@ exports.makeVendor = async (userId) => {
   return result.rows[0];
 };
 
+exports.completeOnboarding = async (userId) => {
+  const result = await pool.query(
+    `
+    UPDATE users
+    SET
+      onboarding_completed = TRUE,
+      updated_at = NOW()
+    WHERE id = $1
+      AND is_vendor = TRUE
+    RETURNING
+      ${USER_FIELDS}
+    `,
+    [userId]
+  );
 
-// Save OTP
+  return result.rows[0];
+};
+
 exports.saveOtp = async (
   userId,
   otp,
@@ -284,8 +266,6 @@ exports.saveOtp = async (
   );
 };
 
-
-// Get latest OTP
 exports.getLatestOtp = async (
   userId,
   method
@@ -308,8 +288,6 @@ exports.getLatestOtp = async (
   return result.rows[0];
 };
 
-
-// Check if OTP can be resent
 exports.canResendOtp = async (
   userId,
   method
@@ -343,8 +321,6 @@ exports.canResendOtp = async (
   return elapsedSeconds >= 90;
 };
 
-
-// Get OTP resend time
 exports.getResendTime = async (
   userId,
   method
@@ -381,8 +357,6 @@ exports.getResendTime = async (
   );
 };
 
-
-// Delete OTP
 exports.deleteOtp = async (
   userId,
   method
