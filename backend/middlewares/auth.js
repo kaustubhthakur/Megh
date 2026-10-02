@@ -1,8 +1,10 @@
 const jwt = require("jsonwebtoken");
 
+const User = require("../models/user");
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
-module.exports = async (req, res, next) => {
+exports.auth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -27,9 +29,17 @@ module.exports = async (req, res, next) => {
       JWT_SECRET
     );
 
-    req.user = {
-      id: decoded.userId,
-    };
+    const user = await User.findUserById(
+      decoded.userId
+    );
+
+    if (!user) {
+      return res.status(401).json({
+        message: "User not found",
+      });
+    }
+
+    req.user = user;
 
     next();
   } catch (error) {
@@ -37,4 +47,24 @@ module.exports = async (req, res, next) => {
       message: "Invalid or expired token",
     });
   }
+};
+
+exports.isUser = (req, res, next) => {
+  if (req.user.is_vendor) {
+    return res.status(403).json({
+      message: "Normal user access required",
+    });
+  }
+
+  next();
+};
+
+exports.isVendor = (req, res, next) => {
+  if (!req.user.is_vendor) {
+    return res.status(403).json({
+      message: "Vendor access required",
+    });
+  }
+
+  next();
 };
