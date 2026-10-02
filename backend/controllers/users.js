@@ -32,6 +32,32 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.getAllUsers();
+
+    return res.status(200).json({
+      users: users.map((user) => ({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        avatar: user.avatar,
+        is_vendor: user.is_vendor,
+        email_verified: user.email_verified,
+        phone_verified: user.phone_verified,
+        onboarding_completed: user.onboarding_completed,
+      })),
+    });
+  } catch (error) {
+    console.error("Get users error:", error);
+
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+};
+
 exports.updateProfile = async (req, res) => {
   try {
     const {
