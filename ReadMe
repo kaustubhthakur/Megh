@@ -1,3 +1,23 @@
 Queueless 
 It is a simple digital queue platform that lets people register remotely, receive a token, and track their live position without physically waiting in line.
 Businesses can manage queues effortlessly while customers know exactly when their turn is approaching.
+
+
+
+i)                     QUEUELESS
+                       │
+              ┌────────┴────────┐
+              │                 │
+              ▼                 ▼
+           VENDOR             USER
+              │                 │
+       Creates/manages       Joins queues
+          queues                 │
+              │                  │
+      ┌───────┼───────┐          │
+      ▼       ▼       ▼          ▼
+   Hospital  Govt   Business   Customer
+      │       │       │          │
+      └───────┴───────┘          │
+              │                  │
+              └──── Queue ──────┘
