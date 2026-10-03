@@ -3,20 +3,3 @@ It is a simple digital queue platform that lets people register remotely, receiv
 Businesses can manage queues effortlessly while customers know exactly when their turn is approaching.
 
 
-                   QUEUELESS
-                       │
-              ┌────────┴────────┐
-              │                 │
-              ▼                 ▼
-           VENDOR             USER
-              │                 │
-       Creates/manages       Joins queues
-          queues                 │
-              │                  │
-      ┌───────┼───────┐          │
-      ▼       ▼       ▼          ▼
-   Hospital  Govt   Business   Customer
-      │       │       │          │
-      └───────┴───────┘          │
-              │                  │
-              └──── Queue ──────┘
