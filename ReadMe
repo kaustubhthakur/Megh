@@ -1,4 +1,46 @@
 Megh
--  a superstorage using email space
+Megh is a unified cloud storage platform that brings multiple cloud accounts together, giving users one dashboard to monitor and manage their combined storage capacity.
 
 
+       ┌──────────────────────┐
+       │   User Signs Up      │
+       │      for Megh        │
+       └──────────┬───────────┘
+                  │
+                  ▼
+       ┌──────────────────────┐
+       │ Connect Cloud        │
+       │ Accounts             │
+       └──────────┬───────────┘
+                  │
+          ┌───────┼────────┐
+          ▼       ▼        ▼
+     ┌────────┐ ┌────────┐ ┌────────┐
+     │Google  │ │Google  │ │OneDrive│
+     │Account1│ │Account2│ │Account │
+     └────┬───┘ └───┬────┘ └───┬────┘
+          │         │          │
+          └─────────┼──────────┘
+                    ▼
+       ┌──────────────────────┐
+       │ Fetch Storage Quotas │
+       │ & Used Space         │
+       └──────────┬───────────┘
+                  │
+                  ▼
+       ┌──────────────────────┐
+       │ Calculate Combined   │
+       │ Storage Capacity     │
+       └──────────┬───────────┘
+                  │
+                  ▼
+       ┌──────────────────────┐
+       │ Unified Storage      │
+       │ Dashboard            │
+       └──────────┬───────────┘
+                  │
+                  ▼
+       ┌──────────────────────┐
+       │ Upload or Manage     │
+       │ Files Through Megh   │
+       └──────────────────────┘
