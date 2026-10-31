@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 
 namespace backend.Models;
@@ -8,15 +9,26 @@ public class User
 
     [Required]
     [MaxLength(100)]
-    public string FullName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(50)]
+    public string Username { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(254)]
+    [EmailAddress]
     public string Email { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(100)]
     public string PasswordHash { get; set; } = string.Empty;
 
+    public long StorageUsedBytes { get; set; } = 0;
+
+    public long StorageLimitBytes { get; set; } = 1073741824;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -1,3 +1,4 @@
+
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,19 @@ public class ApplicationDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>()
-            .HasIndex(user => user.Email)
+            .HasIndex(u => u.Email)
             .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.StorageUsedBytes)
+            .HasDefaultValue(0L);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.StorageLimitBytes)
+            .HasDefaultValue(1073741824L);
     }
 }

@@ -1,9 +1,11 @@
-using System.Security.Claims;
+using backend.Data;
 using backend.DTOs;
 using backend.Services;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace backend.Controllers;
 
@@ -14,6 +16,7 @@ public class AuthController : ControllerBase
     private readonly AuthService _authService;
     private readonly IAntiforgery _antiforgery;
     private readonly IConfiguration _configuration;
+    private readonly ApplicationDbContext _dbContext;
 
     private string AuthCookieName =>
         _configuration["Auth:CookieName"] ?? "__Host-megh-auth";
@@ -24,11 +27,13 @@ public class AuthController : ControllerBase
     public AuthController(
         AuthService authService,
         IAntiforgery antiforgery,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ApplicationDbContext dbContext)
     {
         _authService = authService;
         _antiforgery = antiforgery;
         _configuration = configuration;
+        _dbContext = dbContext;
     }
 
     [HttpGet("csrf")]
@@ -58,14 +63,13 @@ public class AuthController : ControllerBase
                 user = new
                 {
                     id = result.UserId,
-                    fullName = result.FullName,
-                    email = result.Email
+                    name = result.Name,
+                    username = result.Username,
+                    email = result.Email,
+                    storageUsedBytes = result.StorageUsedBytes,
+                    storageLimitBytes = result.StorageLimitBytes
                 }
             });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
@@ -77,51 +81,64 @@ public class AuthController : ControllerBase
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        try
+        var result = await _authService.LoginAsync(dto);
+
+        if (result is null)
         {
-            var result = await _authService.LoginAsync(dto);
-
-            if (result is null)
+            return Unauthorized(new
             {
-                return Unauthorized(new
-                {
-                    message = "Invalid email or password."
-                });
-            }
-
-            SetAuthCookie(result.Token);
-
-            return Ok(new
-            {
-                message = "Login successful.",
-                user = new
-                {
-                    id = result.UserId,
-                    fullName = result.FullName,
-                    email = result.Email
-                }
+                message = "Invalid email or password."
             });
         }
-        catch (ArgumentException ex)
+
+        SetAuthCookie(result.Token);
+
+        return Ok(new
         {
-            return BadRequest(new { message = ex.Message });
-        }
+            message = "Login successful.",
+            user = new
+            {
+                id = result.UserId,
+                name = result.Name,
+                username = result.Username,
+                email = result.Email,
+                storageUsedBytes = result.StorageUsedBytes,
+                storageLimitBytes = result.StorageLimitBytes
+            }
+        });
     }
 
     [HttpGet("me")]
     [Authorize]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var fullName = User.FindFirst(ClaimTypes.Name)?.Value;
-        var email = User.FindFirst(ClaimTypes.Email)?.Value;
+        var userIdValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        return Ok(new
+        if (!int.TryParse(userIdValue, out var userId))
         {
-            id = userId,
-            fullName,
-            email
-        });
+            return Unauthorized();
+        }
+
+        var user = await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Id == userId)
+            .Select(u => new
+            {
+                id = u.Id,
+                name = u.Name,
+                username = u.Username,
+                email = u.Email,
+                storageUsedBytes = u.StorageUsedBytes,
+                storageLimitBytes = u.StorageLimitBytes
+            })
+            .SingleOrDefaultAsync();
+
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(user);
     }
 
     [HttpPost("logout")]

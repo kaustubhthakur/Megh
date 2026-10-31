@@ -1,3 +1,4 @@
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,208 +10,170 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Services;
 
-public sealed record AuthResult(
+public record AuthResult(
     string Token,
     int UserId,
-    string FullName,
-    string Email
+    string Name,
+    string Username,
+    string Email,
+    long StorageUsedBytes,
+    long StorageLimitBytes
 );
 
 public class AuthService
 {
-    private readonly ApplicationDbContext _db;
+    private readonly ApplicationDbContext _dbContext;
     private readonly IConfiguration _configuration;
 
     public AuthService(
-        ApplicationDbContext db,
+        ApplicationDbContext dbContext,
         IConfiguration configuration)
     {
-        _db = db;
+        _dbContext = dbContext;
         _configuration = configuration;
     }
 
-
     public async Task<AuthResult> RegisterAsync(RegisterDto dto)
     {
+        var name = dto.Name.Trim();
+        var username = dto.Username.Trim().ToLowerInvariant();
         var email = dto.Email.Trim().ToLowerInvariant();
 
-
-        if (Encoding.UTF8.GetByteCount(dto.Password) > 72)
+        if (await _dbContext.Users.AnyAsync(u => u.Email == email))
         {
-            throw new ArgumentException(
-                "Password must not exceed 72 UTF-8 bytes.");
+            throw new InvalidOperationException("Email is already registered.");
         }
 
-        var existingUser = await _db.Users
-            .AnyAsync(u => u.Email == email);
-
-        if (existingUser)
+        if (await _dbContext.Users.AnyAsync(u => u.Username == username))
         {
-            throw new InvalidOperationException(
-                "An account with this email already exists.");
+            throw new InvalidOperationException("Username is already taken.");
         }
-
-        // Hash the password before saving it.
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(
-            dto.Password,
-            workFactor: 12);
 
         var user = new User
         {
-            FullName = dto.FullName.Trim(),
+            Name = name,
+            Username = username,
             Email = email,
-            PasswordHash = passwordHash,
-            CreatedAt = DateTime.UtcNow
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password, 12),
+            StorageUsedBytes = 0,
+            StorageLimitBytes = 1073741824,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
-        _db.Users.Add(user);
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
 
-        try
-        {
-            await _db.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-      
-            throw new InvalidOperationException(
-                "Unable to register this account. The email may already be registered.");
-        }
-
-        return GenerateToken(user);
+        return CreateAuthResult(user);
     }
 
-   
     public async Task<AuthResult?> LoginAsync(LoginDto dto)
     {
         var email = dto.Email.Trim().ToLowerInvariant();
 
- 
-        if (Encoding.UTF8.GetByteCount(dto.Password) > 72)
-        {
-            return null;
-        }
-
-        var user = await _db.Users
-            .FirstOrDefaultAsync(u => u.Email == email);
-
-
+        var user = await _dbContext.Users
+            .SingleOrDefaultAsync(u => u.Email == email);
 
         if (user is null)
         {
             return null;
         }
 
-        bool passwordIsValid;
-
-        try
-        {
-            passwordIsValid = BCrypt.Net.BCrypt.Verify(
-                dto.Password,
-                user.PasswordHash);
-        }
-        catch (BCrypt.Net.SaltParseException)
-        {
-            passwordIsValid = false;
-        }
-
-        if (!passwordIsValid)
+        if (Encoding.UTF8.GetByteCount(dto.Password) > 72)
         {
             return null;
         }
 
-        return GenerateToken(user);
+        try
+        {
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                return null;
+            }
+        }
+        catch (BCrypt.Net.SaltParseException)
+        {
+            return null;
+        }
+
+        return CreateAuthResult(user);
     }
 
-    private AuthResult GenerateToken(User user)
+    private AuthResult CreateAuthResult(User user)
     {
-        var keyString = _configuration["Jwt:Key"]
-            ?? throw new InvalidOperationException(
-                "JWT signing key is not configured.");
+        var token = GenerateJwtToken(user);
+
+        return new AuthResult(
+            token,
+            user.Id,
+            user.Name,
+            user.Username,
+            user.Email,
+            user.StorageUsedBytes,
+            user.StorageLimitBytes
+        );
+    }
+
+    private string GenerateJwtToken(User user)
+    {
+        var keyValue = _configuration["Jwt:Key"]
+            ?? throw new InvalidOperationException("JWT signing key is not configured.");
 
         var issuer = _configuration["Jwt:Issuer"]
-            ?? throw new InvalidOperationException(
-                "JWT issuer is not configured.");
+            ?? throw new InvalidOperationException("JWT issuer is not configured.");
 
         var audience = _configuration["Jwt:Audience"]
-            ?? throw new InvalidOperationException(
-                "JWT audience is not configured.");
+            ?? throw new InvalidOperationException("JWT audience is not configured.");
 
         byte[] keyBytes;
 
         try
         {
-            keyBytes = Convert.FromBase64String(keyString);
+            keyBytes = Convert.FromBase64String(keyValue);
         }
         catch (FormatException)
         {
-            throw new InvalidOperationException(
-                "JWT signing key must be Base64 encoded.");
+            throw new InvalidOperationException("JWT signing key must be valid Base64.");
         }
 
         if (keyBytes.Length < 32)
         {
-            throw new InvalidOperationException(
-                "JWT signing key must contain at least 32 bytes.");
+            throw new InvalidOperationException("JWT signing key must contain at least 32 bytes.");
         }
 
-        var expiresMinutes = 30;
+        var expiresMinutes = _configuration.GetValue<int?>("Jwt:ExpiresMinutes") ?? 30;
 
-        if (int.TryParse(
-                _configuration["Jwt:ExpiresMinutes"],
-                out var configuredMinutes))
+        if (expiresMinutes is < 1 or > 60)
         {
-            expiresMinutes = configuredMinutes;
+            throw new InvalidOperationException("JWT expiration must be between 1 and 60 minutes.");
         }
 
-        if (expiresMinutes < 1 || expiresMinutes > 60)
+        var claims = new[]
         {
-            throw new InvalidOperationException(
-                "Jwt:ExpiresMinutes must be between 1 and 60.");
-        }
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim("username", user.Username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
 
         var signingKey = new SymmetricSecurityKey(keyBytes);
 
         var credentials = new SigningCredentials(
             signingKey,
-            SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
-        {
-            new Claim(
-                JwtRegisteredClaimNames.Sub,
-                user.Id.ToString()),
-
-            new Claim(
-                ClaimTypes.NameIdentifier,
-                user.Id.ToString()),
-
-            new Claim(
-                ClaimTypes.Name,
-                user.FullName),
-
-            new Claim(
-                ClaimTypes.Email,
-                user.Email),
-
-            new Claim(
-                JwtRegisteredClaimNames.Jti,
-                Guid.NewGuid().ToString())
-        };
+            SecurityAlgorithms.HmacSha256
+        );
 
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
+            notBefore: DateTime.UtcNow,
             expires: DateTime.UtcNow.AddMinutes(expiresMinutes),
-            signingCredentials: credentials);
+            signingCredentials: credentials
+        );
 
-        var tokenString = new JwtSecurityTokenHandler()
-            .WriteToken(token);
-
-        return new AuthResult(
-            tokenString,
-            user.Id,
-            user.FullName,
-            user.Email);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

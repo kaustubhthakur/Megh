@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 
 namespace backend.DTOs;
@@ -6,7 +7,12 @@ public class RegisterDto
 {
     [Required]
     [StringLength(100, MinimumLength = 2)]
-    public string FullName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(50, MinimumLength = 3)]
+    [RegularExpression(@"^[a-zA-Z0-9_.-]+$")]
+    public string Username { get; set; } = string.Empty;
 
     [Required]
     [EmailAddress]
