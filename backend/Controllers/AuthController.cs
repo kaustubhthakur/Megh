@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using backend.DTOs;
 using backend.Services;
 using Microsoft.AspNetCore.Antiforgery;
@@ -10,19 +11,25 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private const string AuthCookieName = "__Host-megh-auth";
-
     private readonly AuthService _authService;
     private readonly IAntiforgery _antiforgery;
+    private readonly IConfiguration _configuration;
+
+    private string AuthCookieName =>
+        _configuration["Auth:CookieName"] ?? "__Host-megh-auth";
+
+    private int CookieMaxAgeMinutes =>
+        _configuration.GetValue<int?>("Auth:CookieMaxAgeMinutes") ?? 30;
 
     public AuthController(
         AuthService authService,
-        IAntiforgery antiforgery)
+        IAntiforgery antiforgery,
+        IConfiguration configuration)
     {
         _authService = authService;
         _antiforgery = antiforgery;
+        _configuration = configuration;
     }
-
 
     [HttpGet("csrf")]
     public IActionResult GetCsrfToken()
@@ -35,11 +42,9 @@ public class AuthController : ControllerBase
         });
     }
 
-    
     [HttpPost("register")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(
-        [FromBody] RegisterDto dto)
+    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
         try
         {
@@ -58,21 +63,19 @@ public class AuthController : ControllerBase
                 }
             });
         }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { message = ex.Message });
-        }
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
         }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
- 
     [HttpPost("login")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(
-        [FromBody] LoginDto dto)
+    public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         try
         {
@@ -105,19 +108,13 @@ public class AuthController : ControllerBase
         }
     }
 
-
     [HttpGet("me")]
     [Authorize]
     public IActionResult GetCurrentUser()
     {
-        var userId = User.FindFirst(
-            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        var fullName = User.FindFirst(
-            System.Security.Claims.ClaimTypes.Name)?.Value;
-
-        var email = User.FindFirst(
-            System.Security.Claims.ClaimTypes.Email)?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var fullName = User.FindFirst(ClaimTypes.Name)?.Value;
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
 
         return Ok(new
         {
@@ -160,7 +157,7 @@ public class AuthController : ControllerBase
                 SameSite = SameSiteMode.Lax,
                 Path = "/",
                 IsEssential = true,
-                MaxAge = TimeSpan.FromMinutes(30)
+                MaxAge = TimeSpan.FromMinutes(CookieMaxAgeMinutes)
             });
     }
 }
