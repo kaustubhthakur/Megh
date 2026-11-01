@@ -1,4 +1,3 @@
-
 using backend.Data;
 using backend.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +33,9 @@ public class UserController : ControllerBase
                 username = u.Username,
                 email = u.Email,
                 storageUsedBytes = u.StorageUsedBytes,
-                storageLimitBytes = u.StorageLimitBytes
+                storageLimitBytes = u.StorageLimitBytes,
+                createdAt = u.CreatedAt,
+                updatedAt = u.UpdatedAt
             })
             .ToListAsync();
 
@@ -56,7 +57,51 @@ public class UserController : ControllerBase
                 username = u.Username,
                 email = u.Email,
                 storageUsedBytes = u.StorageUsedBytes,
-                storageLimitBytes = u.StorageLimitBytes
+                storageLimitBytes = u.StorageLimitBytes,
+                createdAt = u.CreatedAt,
+                updatedAt = u.UpdatedAt
+            })
+            .SingleOrDefaultAsync();
+
+        if (user is null)
+        {
+            return NotFound(new
+            {
+                message = "User not found."
+            });
+        }
+
+        return Ok(user);
+    }
+
+    // GET: api/user/profile
+    // Get the authenticated user's profile
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
+    {
+        var userId = GetAuthenticatedUserId();
+
+        if (userId is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid user authentication."
+            });
+        }
+
+        var user = await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Id == userId.Value)
+            .Select(u => new
+            {
+                id = u.Id,
+                name = u.Name,
+                username = u.Username,
+                email = u.Email,
+                storageUsedBytes = u.StorageUsedBytes,
+                storageLimitBytes = u.StorageLimitBytes,
+                createdAt = u.CreatedAt,
+                updatedAt = u.UpdatedAt
             })
             .SingleOrDefaultAsync();
 
@@ -74,13 +119,13 @@ public class UserController : ControllerBase
     // PUT: api/user/profile
     // Update the authenticated user's profile
     [HttpPut("profile")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateProfile(
         [FromBody] UpdateProfileDto dto)
     {
-        var userIdValue =
-            User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = GetAuthenticatedUserId();
 
-        if (!int.TryParse(userIdValue, out var userId))
+        if (userId is null)
         {
             return Unauthorized(new
             {
@@ -89,7 +134,7 @@ public class UserController : ControllerBase
         }
 
         var user = await _dbContext.Users
-            .SingleOrDefaultAsync(u => u.Id == userId);
+            .SingleOrDefaultAsync(u => u.Id == userId.Value);
 
         if (user is null)
         {
@@ -99,8 +144,8 @@ public class UserController : ControllerBase
             });
         }
 
-        var name = dto.Name?.Trim();
-        var username = dto.Username?.Trim();
+        var name = dto.Name.Trim();
+        var username = dto.Username.Trim();
 
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -118,10 +163,10 @@ public class UserController : ControllerBase
             });
         }
 
-        // Check whether another user already uses this username.
+        // Check if another user already has this username.
         var usernameExists = await _dbContext.Users
             .AnyAsync(u =>
-                u.Id != userId &&
+                u.Id != user.Id &&
                 u.Username == username);
 
         if (usernameExists)
@@ -134,6 +179,7 @@ public class UserController : ControllerBase
 
         user.Name = name;
         user.Username = username;
+        user.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
 
@@ -147,8 +193,23 @@ public class UserController : ControllerBase
                 username = user.Username,
                 email = user.Email,
                 storageUsedBytes = user.StorageUsedBytes,
-                storageLimitBytes = user.StorageLimitBytes
+                storageLimitBytes = user.StorageLimitBytes,
+                createdAt = user.CreatedAt,
+                updatedAt = user.UpdatedAt
             }
         });
+    }
+
+    private int? GetAuthenticatedUserId()
+    {
+        var userIdValue =
+            User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (int.TryParse(userIdValue, out var userId))
+        {
+            return userId;
+        }
+
+        return null;
     }
 }
