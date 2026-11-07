@@ -38,7 +38,9 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-
+builder.Services.AddScoped<StoragePlacementService>();
+builder.Services.AddScoped<FragmentationService>();
+builder.Services.AddScoped<FileReassemblyService>();
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
