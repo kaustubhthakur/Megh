@@ -19,8 +19,6 @@ public class UserController : ControllerBase
         _dbContext = dbContext;
     }
 
-    // GET: api/user
-    // Get all users
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
@@ -42,8 +40,6 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
-    // GET: api/user/5
-    // Get a user by ID
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetUser(int id)
     {
@@ -73,9 +69,6 @@ public class UserController : ControllerBase
 
         return Ok(user);
     }
-
-    // GET: api/user/profile
-    // Get the authenticated user's profile
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
@@ -116,8 +109,6 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
-    // PUT: api/user/profile
-    // Update the authenticated user's profile
     [HttpPut("profile")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateProfile(
@@ -163,7 +154,6 @@ public class UserController : ControllerBase
             });
         }
 
-        // Check if another user already has this username.
         var usernameExists = await _dbContext.Users
             .AnyAsync(u =>
                 u.Id != user.Id &&
