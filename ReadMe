@@ -1,46 +1,71 @@
-Megh
-Megh is a unified cloud storage platform that brings multiple cloud accounts together, giving users one dashboard to monitor and manage their combined storage capacity.   
+# Megh – Unified Cloud Storage Platform
 
+## About
 
-       ┌──────────────────────┐
-       │   User Signs Up      │
-       │      for Megh        │
-       └──────────┬───────────┘
-                  │
-                  ▼
-       ┌──────────────────────┐
-       │ Connect Cloud        │
-       │ Accounts             │
-       └──────────┬───────────┘
-                  │
-          ┌───────┼────────┐
-          ▼       ▼        ▼
-     ┌────────┐ ┌────────┐ ┌────────┐
-     │Google  │ │Google  │ │OneDrive│
-     │Account1│ │Account2│ │Account │
-     └────┬───┘ └───┬────┘ └───┬────┘
-          │         │          │
-          └─────────┼──────────┘
-                    ▼
-       ┌──────────────────────┐
-       │ Fetch Storage Quotas │
-       │ & Used Space         │
-       └──────────┬───────────┘
-                  │
-                  ▼
-       ┌──────────────────────┐
-       │ Calculate Combined   │
-       │ Storage Capacity     │
-       └──────────┬───────────┘
-                  │
-                  ▼
-       ┌──────────────────────┐
-       │ Unified Storage      │
-       │ Dashboard            │
-       └──────────┬───────────┘
-                  │
-                  ▼
-       ┌──────────────────────┐
-       │ Upload or Manage     │
-       │ Files Through Megh   │
-       └──────────────────────┘
+Megh is a unified cloud storage platform that brings multiple cloud storage accounts together into a single interface.
+
+Users can connect multiple accounts from providers such as Google Drive, OneDrive, and Dropbox. Megh fetches the storage information from each connected account and combines it to display the total, used, and available storage in one dashboard.
+
+The platform also aims to let users upload and manage files through one interface, distributing file data across their connected cloud storage accounts.
+
+## Architecture Flow
+
+                 ┌──────────────────────┐
+                 │        User          │
+                 │   Registers / Login  │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │    Megh Dashboard    │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ Connect Cloud        │
+                 │ Accounts using OAuth │
+                 └──────────┬───────────┘
+                            │
+              ┌─────────────┼─────────────┐
+              ▼             ▼             ▼
+        ┌──────────┐  ┌──────────┐  ┌──────────┐
+        │ Google   │  │ OneDrive │  │ Dropbox  │
+        │ Drive 1  │  │ Account  │  │ Account  │
+        └────┬─────┘  └────┬─────┘  └────┬─────┘
+             │             │             │
+             └─────────────┼─────────────┘
+                           ▼
+                ┌──────────────────────┐
+                │ Fetch Storage        │
+                │ Information          │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │ Combine Storage      │
+                │ Capacity             │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │ Unified Storage      │
+                │ Dashboard            │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │ Upload / Manage      │
+                │ Files Through Megh   │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │ Fragment and         │
+                │ Distribute File Data │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │ Connected Cloud      │
+                │ Storage Accounts     │
+                └──────────────────────┘
