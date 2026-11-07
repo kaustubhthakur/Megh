@@ -108,7 +108,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    [HttpGet("me")]
+    [HttpGet("profile")]
     [Authorize]
     public async Task<IActionResult> GetCurrentUser()
     {
