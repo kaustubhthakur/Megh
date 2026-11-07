@@ -29,6 +29,7 @@ public class User
     public long StorageLimitBytes { get; set; } = 1073741824;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+    public ICollection<ConnectedAccount> ConnectedAccounts { get; set; }
+    = new List<ConnectedAccount>();
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
