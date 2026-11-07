@@ -50,6 +50,10 @@
               "target": "Package",
               "version": "[4.2.0, )"
             },
+            "Google.Apis.Auth": {
+              "target": "Package",
+              "version": "[1.78.0, )"
+            },
             "Google.Apis.Drive.v3": {
               "target": "Package",
               "version": "[1.78.0.4313, )"

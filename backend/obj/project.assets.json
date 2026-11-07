@@ -2855,6 +2855,7 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "BCrypt.Net-Next >= 4.2.0",
+      "Google.Apis.Auth >= 1.78.0",
       "Google.Apis.Drive.v3 >= 1.78.0.4313",
       "Microsoft.AspNetCore.Authentication.Google >= 10.0.14",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 10.0.14",
@@ -2911,6 +2912,10 @@
           "BCrypt.Net-Next": {
             "target": "Package",
             "version": "[4.2.0, )"
+          },
+          "Google.Apis.Auth": {
+            "target": "Package",
+            "version": "[1.78.0, )"
           },
           "Google.Apis.Drive.v3": {
             "target": "Package",
