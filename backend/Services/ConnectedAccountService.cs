@@ -14,7 +14,6 @@ public class ConnectedAccountService : IConnectedAccountService
         _context = context;
     }
 
-    // Get all connected accounts belonging to a user
     public async Task<List<ConnectedAccountResponseDto>> GetAccountsAsync(
         int userId)
     {
@@ -36,7 +35,6 @@ public class ConnectedAccountService : IConnectedAccountService
             .ToListAsync();
     }
 
-    // Get one account by ID
     public async Task<ConnectedAccountResponseDto?> GetAccountByIdAsync(
         int userId, int accountId)
     {
@@ -61,7 +59,6 @@ public class ConnectedAccountService : IConnectedAccountService
             .FirstOrDefaultAsync();
     }
 
-    // Disconnect account (soft delete)
     public async Task<bool> DisconnectAccountAsync(
         int userId, int accountId)
     {
@@ -76,8 +73,6 @@ public class ConnectedAccountService : IConnectedAccountService
 
         account.IsConnected = false;
 
-        // Remove credentials from the active account record.
-        // Consider revoking provider authorization before this step.
         account.EncryptedAccessToken = string.Empty;
         account.EncryptedRefreshToken = null;
         account.TokenExpiresAt = null;
@@ -87,7 +82,6 @@ public class ConnectedAccountService : IConnectedAccountService
         return true;
     }
 
-    // Calculate combined storage
     public async Task<StorageSummaryDto> GetStorageSummaryAsync(
         int userId)
     {

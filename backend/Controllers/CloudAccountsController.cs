@@ -19,7 +19,6 @@ public class CloudAccountsController : ControllerBase
         _accountService = accountService;
     }
 
-    // Get authenticated user's ID
     private bool TryGetUserId(out int userId)
     {
         userId = 0;
@@ -31,7 +30,6 @@ public class CloudAccountsController : ControllerBase
         return int.TryParse(userIdClaim, out userId);
     }
 
-    // GET: api/CloudAccounts
     [HttpGet]
     public async Task<IActionResult> GetAccounts()
     {
@@ -44,7 +42,6 @@ public class CloudAccountsController : ControllerBase
         return Ok(accounts);
     }
 
-    // GET: api/CloudAccounts/{id}
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAccount(int id)
     {
@@ -63,7 +60,6 @@ public class CloudAccountsController : ControllerBase
         return Ok(account);
     }
 
-    // DELETE: api/CloudAccounts/{id}
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DisconnectAccount(int id)
     {
@@ -85,7 +81,7 @@ public class CloudAccountsController : ControllerBase
         });
     }
 
-    // GET: api/CloudAccounts/storage-summary
+
     [HttpGet("storage-summary")]
     public async Task<IActionResult> GetStorageSummary()
     {
