@@ -5,7 +5,7 @@ using backend.Data;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-
+using System.Text.Json.Serialization;
 namespace backend.Services.CloudStorage;
 
 public class GoogleOAuthService
@@ -307,9 +307,12 @@ public class GoogleOAuthService
         public string TokenType { get; set; } = string.Empty;
     }
 
-    private sealed class GoogleUser
-    {
-        public string Subject { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-    }
+  private sealed class GoogleUser
+{
+    [JsonPropertyName("sub")]
+    public string Subject { get; set; } = string.Empty;
+
+    [JsonPropertyName("email")]
+    public string Email { get; set; } = string.Empty;
+}
 }
