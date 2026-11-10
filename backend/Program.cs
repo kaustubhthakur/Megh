@@ -127,7 +127,7 @@ builder.Services
                 RoleClaimType = ClaimTypes.Role
             };
     });
-
+builder.Services.AddScoped<IConnectedAccountService,ConnectedAccountService>();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
