@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IFileChunkService, FileChunkService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 

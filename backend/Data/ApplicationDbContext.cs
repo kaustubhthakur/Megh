@@ -37,7 +37,10 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>()
             .Property(u => u.StorageLimitBytes)
             .HasDefaultValue(1073741824L);
-
+        
+        modelBuilder.Entity<FileChunk>()
+            .HasIndex(c => new { c.StoredFileId, c.SequenceNumber })
+            .IsUnique();
         modelBuilder.Entity<ConnectedAccount>()
             .HasOne(a => a.User)
             .WithMany(u => u.ConnectedAccounts)
