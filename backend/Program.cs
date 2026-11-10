@@ -5,7 +5,7 @@ using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
+using backend.Services.CloudStorage;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -30,7 +30,18 @@ builder.Services.AddScoped<IUploadSessionService, UploadSessionService>();
 builder.Services.AddScoped<IStoredFileService, StoredFileService>();
 builder.Services.AddScoped<IFileChunkService, FileChunkService>();
 builder.Services.AddScoped<IConnectedAccountService, ConnectedAccountService>();
+builder.Services.AddMemoryCache();
 
+builder.Services.AddDataProtection();
+
+builder.Services.Configure<GoogleOAuthOptions>(
+    builder.Configuration.GetSection("Google"));
+
+builder.Services.AddScoped<
+    ITokenProtectionService,
+    DataProtectionTokenService>();
+
+builder.Services.AddHttpClient<GoogleOAuthService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
