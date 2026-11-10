@@ -131,3 +131,10 @@ C:\Users\tkaus\OneDrive\Desktop\Megh\backend\obj\Debug\net10.0\refint\backend.dl
 C:\Users\tkaus\OneDrive\Desktop\Megh\backend\obj\Debug\net10.0\backend.pdb
 C:\Users\tkaus\OneDrive\Desktop\Megh\backend\obj\Debug\net10.0\backend.genruntimeconfig.cache
 C:\Users\tkaus\OneDrive\Desktop\Megh\backend\obj\Debug\net10.0\ref\backend.dll
+C:\Users\tkaus\OneDrive\Desktop\Megh\backend\bin\Debug\net10.0\Google.Apis.dll
+C:\Users\tkaus\OneDrive\Desktop\Megh\backend\bin\Debug\net10.0\Google.Apis.Auth.dll
+C:\Users\tkaus\OneDrive\Desktop\Megh\backend\bin\Debug\net10.0\Google.Apis.Core.dll
+C:\Users\tkaus\OneDrive\Desktop\Megh\backend\bin\Debug\net10.0\Google.Apis.Drive.v3.dll
+C:\Users\tkaus\OneDrive\Desktop\Megh\backend\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.Google.dll
+C:\Users\tkaus\OneDrive\Desktop\Megh\backend\bin\Debug\net10.0\System.Management.dll
+C:\Users\tkaus\OneDrive\Desktop\Megh\backend\bin\Debug\net10.0\runtimes\win\lib\net7.0\System.Management.dll
