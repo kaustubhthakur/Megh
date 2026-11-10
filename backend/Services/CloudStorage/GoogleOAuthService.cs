@@ -299,13 +299,20 @@ public class GoogleOAuthService
         return result;
     }
 
-    private sealed class TokenResponse
-    {
-        public string AccessToken { get; set; } = string.Empty;
-        public string? RefreshToken { get; set; }
-        public int ExpiresIn { get; set; }
-        public string TokenType { get; set; } = string.Empty;
-    }
+  private sealed class TokenResponse
+{
+    [JsonPropertyName("access_token")]
+    public string AccessToken { get; set; } = string.Empty;
+
+    [JsonPropertyName("refresh_token")]
+    public string? RefreshToken { get; set; }
+
+    [JsonPropertyName("expires_in")]
+    public int ExpiresIn { get; set; }
+
+    [JsonPropertyName("token_type")]
+    public string TokenType { get; set; } = string.Empty;
+}
 
   private sealed class GoogleUser
 {
