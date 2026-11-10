@@ -1,17 +1,13 @@
+
 using System.Security.Claims;
 using backend.Data;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IUploadSessionService, UploadSessionService>();
-builder.Services.AddScoped<IStoredFileService, StoredFileService>();
-builder.Services.AddScoped<IFileChunkService, FileChunkService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -28,6 +24,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<StorageService>();
+
+builder.Services.AddScoped<IUploadSessionService, UploadSessionService>();
+builder.Services.AddScoped<IStoredFileService, StoredFileService>();
+builder.Services.AddScoped<IFileChunkService, FileChunkService>();
+builder.Services.AddScoped<IConnectedAccountService, ConnectedAccountService>();
 
 builder.Services.AddCors(options =>
 {
@@ -53,7 +55,8 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.Path = "/";
 });
-builder.Services.AddScoped<StorageService>();
+
+
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
@@ -63,7 +66,7 @@ if (string.IsNullOrWhiteSpace(jwtKey) ||
     string.IsNullOrWhiteSpace(jwtAudience))
 {
     throw new InvalidOperationException(
-        "JWT configuration is missing. Configure Jwt:Key, Jwt:Issuer, and Jwt:Audience using User Secrets or environment variables.");
+        "JWT configuration is missing. Configure Jwt:Key, Jwt:Issuer, and Jwt:Audience.");
 }
 
 byte[] keyBytes;
@@ -131,7 +134,7 @@ builder.Services
                 RoleClaimType = ClaimTypes.Role
             };
     });
-builder.Services.AddScoped<IConnectedAccountService,ConnectedAccountService>();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
