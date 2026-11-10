@@ -26,46 +26,46 @@ The platform also aims to let users upload and manage files through one interfac
                  │ Accounts using OAuth │
                  └──────────┬───────────┘
                             │
-              ┌─────────────┼─────────────┐
-              ▼             ▼             ▼
-        ┌──────────┐  ┌──────────┐  ┌──────────┐
-        │ Google   │  │ OneDrive │  │ Dropbox  │
-        │ Drive 1  │  │ Account  │  │ Account  │
-        └────┬─────┘  └────┬─────┘  └────┬─────┘
-             │             │             │
-             └─────────────┼─────────────┘
+             ┌──────────────┼──────────────┐
+             ▼              ▼              ▼
+       ┌──────────┐   ┌──────────┐   ┌──────────┐
+       │ Google   │   │ OneDrive │   │ Dropbox  │
+       │ Drive 1  │   │ Account  │   │ Account  │
+       └────┬─────┘   └────┬─────┘   └────┬─────┘
+            │              │              │
+            └──────────────┼──────────────┘
                            ▼
-                ┌──────────────────────┐
-                │ Fetch Storage        │
-                │ Information          │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │ Combine Storage      │
-                │ Capacity             │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │ Unified Storage      │
-                │ Dashboard            │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │ Upload / Manage      │
-                │ Files Through Megh   │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │ Fragment and         │
-                │ Distribute File Data │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │ Connected Cloud      │
-                │ Storage Accounts     │
-                └──────────────────────┘
+                 ┌──────────────────────┐
+                 │ Fetch Storage        │
+                 │ Information          │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ Combine Storage      │
+                 │ Capacity             │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ Unified Storage      │
+                 │ Dashboard            │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ Upload / Manage      │
+                 │ Files Through Megh   │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ Fragment and         │
+                 │ Distribute File Data │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ Connected Cloud      │
+                 │ Storage Accounts     │
+                 └──────────────────────┘
