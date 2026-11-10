@@ -10,7 +10,7 @@ public class ApplicationDbContext : DbContext
         : base(options)
     {
     }
-
+    
     public DbSet<User> Users => Set<User>();
     public DbSet<ConnectedAccount> ConnectedAccounts => Set<ConnectedAccount>();
     public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
