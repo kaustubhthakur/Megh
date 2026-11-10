@@ -33,7 +33,10 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>()
             .Property(u => u.StorageUsedBytes)
             .HasDefaultValue(0L);
-
+        
+        modelBuilder.Entity<UploadSession>()
+            .HasIndex(s => s.StoredFileId);
+            
         modelBuilder.Entity<User>()
             .Property(u => u.StorageLimitBytes)
             .HasDefaultValue(1073741824L);

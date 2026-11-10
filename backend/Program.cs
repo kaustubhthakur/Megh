@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IUploadSessionService, UploadSessionService>();
 builder.Services.AddScoped<IStoredFileService, StoredFileService>();
 builder.Services.AddScoped<IFileChunkService, FileChunkService>();
 builder.Services.AddControllers();
