@@ -52,10 +52,12 @@ public class CloudAccountsController : ControllerBase
             await _accountService.GetAccountByIdAsync(userId, id);
 
         if (account == null)
+        {
             return NotFound(new
             {
                 message = "Connected account not found."
             });
+        }
 
         return Ok(account);
     }
@@ -70,17 +72,18 @@ public class CloudAccountsController : ControllerBase
             await _accountService.DisconnectAccountAsync(userId, id);
 
         if (!disconnected)
+        {
             return NotFound(new
             {
                 message = "Connected account not found."
             });
+        }
 
         return Ok(new
         {
             message = "Cloud account disconnected successfully."
         });
     }
-
 
     [HttpGet("storage-summary")]
     public async Task<IActionResult> GetStorageSummary()
