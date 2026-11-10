@@ -10,7 +10,7 @@ public class ApplicationDbContext : DbContext
         : base(options)
     {
     }
-    
+
     public DbSet<User> Users => Set<User>();
     public DbSet<ConnectedAccount> ConnectedAccounts => Set<ConnectedAccount>();
     public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
@@ -33,17 +33,11 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>()
             .Property(u => u.StorageUsedBytes)
             .HasDefaultValue(0L);
-        
-        modelBuilder.Entity<UploadSession>()
-            .HasIndex(s => s.StoredFileId);
-            
+
         modelBuilder.Entity<User>()
             .Property(u => u.StorageLimitBytes)
             .HasDefaultValue(1073741824L);
-        
-        modelBuilder.Entity<FileChunk>()
-            .HasIndex(c => new { c.StoredFileId, c.SequenceNumber })
-            .IsUnique();
+
         modelBuilder.Entity<ConnectedAccount>()
             .HasOne(a => a.User)
             .WithMany(u => u.ConnectedAccounts)
@@ -81,6 +75,12 @@ public class ApplicationDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.ConnectedAccountId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<UploadSession>()
+            .HasOne<StoredFile>()
+            .WithMany()
+            .HasForeignKey(s => s.StoredFileId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<UploadSession>()
             .HasIndex(s => s.StoredFileId);
