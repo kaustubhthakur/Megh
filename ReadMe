@@ -2,12 +2,9 @@
 
 
 Megh is a unified cloud storage platform that brings multiple cloud storage accounts together into a single interface.
-
 Users can connect multiple accounts from providers such as Google Drive. Megh fetches the storage information from each connected account and combines it to display the total, used, and available storage in one dashboard.
-
 The platform also aims to let users upload and manage files through one interface, distributing file data across their connected cloud storage accounts.
 
-]
 
                  ┌──────────────────────┐
                  │        User          │
@@ -27,11 +24,11 @@ The platform also aims to let users upload and manage files through one interfac
                             │
              ┌──────────────┼──────────────┐
              ▼              ▼              ▼
-       ┌──────────┐   ┌──────────┐   ┌──────────┐
-       │ Google   │   │ OneDrive │   │ Dropbox  │
-       │ Drive 1  │   │ Account  │   │ Account  │
-       └────┬─────┘   └────┬─────┘   └────┬─────┘
-            │              │              │
+                      ┌──────────┐   
+                      │ Google   │   
+                      │ Account  │  
+                      └────┬─────┘   
+                           │              
             └──────────────┼──────────────┘
                            ▼
                  ┌──────────────────────┐
